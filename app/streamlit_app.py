@@ -46,9 +46,17 @@ def load_streamlit_page():
         col2: The right column Streamlit object.
         uploaded_file: The uploaded PDF file.
     """
-    st.set_page_config(layout="wide", page_title="LLM Tool")
+    st.set_page_config(layout="wide", page_title="SuperConExtractor")
 
     # Design page layout with 2 columns: File uploader on the left, and other interactions on the right.
+
+    # first a full width row with the title
+    st.title("SuperConExtractor")
+
+    # description
+    st.write("This tool extracts information from scientific papers on superconducting materials and \
+             generates a table with the extracted data.")
+
     col1, col2 = st.columns([0.5, 0.5], gap="large")
 
     with col1:
