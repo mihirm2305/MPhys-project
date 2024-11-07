@@ -6,4 +6,4 @@ pypdf
 pandas
 streamlit
 python-dotenv
-sqlite3
+bookworm
