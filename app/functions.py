@@ -13,6 +13,10 @@ import uuid
 import pandas as pd
 import re
 
+import pysqlite3
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+
 def clean_filename(filename):
     """
     Remove "(number)" pattern from a filename 
