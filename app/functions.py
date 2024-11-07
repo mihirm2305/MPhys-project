@@ -177,8 +177,9 @@ def load_vectorstore(file_name, api_key, vectorstore_path="db"):
 PROMPT_TEMPLATE = """
 You are an assistant for question-answering tasks.
 Use the following pieces of retrieved context to answer
-the question. If you don't know the answer, say that you
-don't know. DON'T MAKE UP ANYTHING.
+the question. If the answer is not in the context, do 
+not guess - there is the option to say "None". Do not add 
+any information that is not in the context.
 
 {context}
 
@@ -187,19 +188,27 @@ don't know. DON'T MAKE UP ANYTHING.
 Answer the question based on the above context: {question}
 """
 
-class AnswerWithSources(BaseModel):
-    """An answer to the question, with sources and reasoning."""
-    answer: str = Field(description="Answer to question")
+class PaperSummary(BaseModel):
+    """Summary of the paper, with the source from which the information was extracted."""
+    answer: str = Field(description="Summary of the paper")
+    sources: str = Field(description="Full direct text chunk from the context used to answer the question")
+
+class TransitionTemp(BaseModel):
+    """Information related to the transition temperature of a superconducting material, with sources and reasoning."""
+    material: str = Field(description="The superconducting material (chemical formula), e.g. 'YBa2Cu3O7' \
+                          - answer must not contain any unknowns e.g. 'x' or 'y' - if there is no \
+                          valid answer, use 'None'")
+    temp: str = Field(description="The superconducting transition temperature (critical temperature Tc) \
+                    in Kelvin, e.g. '92 K' - if no valid answer, use 'None'")
     sources: str = Field(description="Full direct text chunk from the context used to answer the question")
     reasoning: str = Field(description="Explain the reasoning of the answer based on the sources")
     
 
 class ExtractedInfoWithSources(BaseModel):
-    """Extracted information about the research article"""
-    paper_title: AnswerWithSources
-    paper_summary: AnswerWithSources
-    publication_year: AnswerWithSources
-    paper_authors: AnswerWithSources
+    """Extracted information about the superconducting material and its transition temperature."""
+    paper_summary: PaperSummary
+    transition_temp: TransitionTemp
+
 
 def format_docs(docs):
     """
@@ -222,7 +231,9 @@ def query_document(vectorstore, query, api_key):
     :param query: The question to ask the vector store
     :param api_key: The OpenAI API key to use when calling the OpenAI Embeddings API
 
-    :return: A pandas DataFrame with three rows: 'answer', 'source', and 'reasoning'
+    :return: A pandas DataFrame with five columns: 'paper_summary.answer', \
+        'paper_summary.sources', 'transition_temp.material', 'transition_temp.temp', \
+        'transition_temp.sources'
     """
     llm = ChatOpenAI(model="gpt-4o-mini", api_key=api_key)
 
@@ -237,20 +248,9 @@ def query_document(vectorstore, query, api_key):
         )
 
     structured_response = rag_chain.invoke(query)
-    df = pd.DataFrame([structured_response.dict()])
-
-    # Transforming into a table with two rows: 'answer' and 'source'
-    answer_row = []
-    source_row = []
-    reasoning_row = []
-
-    for col in df.columns:
-        answer_row.append(df[col][0]['answer'])
-        source_row.append(df[col][0]['sources'])
-        reasoning_row.append(df[col][0]['reasoning'])
-
-    # Create new dataframe with two rows: 'answer' and 'source'
-    structured_response_df = pd.DataFrame([answer_row, source_row, reasoning_row], columns=df.columns, index=['answer', 'source', 'reasoning'])
+    
+    df = structured_response.dict()
+    structured_response_df = pd.DataFrame(df)
   
     return structured_response_df.T
 
