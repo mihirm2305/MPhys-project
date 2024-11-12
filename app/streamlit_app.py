@@ -44,7 +44,7 @@ def load_streamlit_page():
     Returns:
         col1: The left column Streamlit object.
         col2: The right column Streamlit object.
-        uploaded_file: The uploaded PDF file.
+        uploaded_files: The uploaded PDF file.
     """
     st.set_page_config(layout="wide", page_title="SuperConExtractor")
 
@@ -64,17 +64,18 @@ def load_streamlit_page():
         st.text_input('OpenAI API key', type='password', key='api_key',
                     label_visibility="collapsed", disabled=False)
         st.header("Upload files")
-        uploaded_file = st.file_uploader("Please upload your PDF documents:", type= "pdf", accept_multiple_files=True)
+        uploaded_files = st.file_uploader("Please upload your PDF documents:", type= "pdf", accept_multiple_files=True)
 
-    return col1, col2, uploaded_file
+    return col1, col2, uploaded_files
 
 
 # Make a streamlit page
-col1, col2, uploaded_file = load_streamlit_page()
+col1, col2, uploaded_files = load_streamlit_page()
 
 # Process the input
-if uploaded_file is not None:
+if uploaded_files is not None:
     with col2:
+        uploaded_file = uploaded_files[0]
         display_pdf(uploaded_file)
         
     # Load in the documents
