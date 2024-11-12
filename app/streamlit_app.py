@@ -77,7 +77,7 @@ def load_streamlit_page():
 col1, col2, uploaded_files = load_streamlit_page()
 
 # Process the input
-if uploaded_files is not None:
+if len(uploaded_files) > 0:
     with col2:
         uploaded_file = uploaded_files[0]
         display_pdf(uploaded_file)
