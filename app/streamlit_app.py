@@ -63,8 +63,8 @@ def load_streamlit_page():
         st.header("Input your OpenAI API key")
         st.text_input('OpenAI API key', type='password', key='api_key',
                     label_visibility="collapsed", disabled=False)
-        st.header("Upload file")
-        uploaded_file = st.file_uploader("Please upload your PDF document:", type= "pdf")
+        st.header("Upload files")
+        uploaded_file = st.file_uploader("Please upload your PDF documents:", type= "pdf", accept_multiple_files=True)
 
     return col1, col2, uploaded_file
 
