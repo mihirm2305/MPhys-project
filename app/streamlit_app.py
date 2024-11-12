@@ -24,16 +24,20 @@ def display_pdf(uploaded_file):
     None
     """
     # Read file as bytes:
-    bytes_data = uploaded_file.getvalue()
+    # bytes_data = uploaded_file.getvalue()
     
     # Convert to Base64
-    base64_pdf = base64.b64encode(bytes_data).decode('utf-8')
+    # base64_pdf = base64.b64encode(bytes_data).decode('utf-8')
     
     # Embed PDF in HTML
-    pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf"></iframe>'
+    # pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf"></iframe>'
     
     # Display file
-    st.markdown(pdf_display, unsafe_allow_html=True)
+    # st.markdown(pdf_display, unsafe_allow_html=True)
+
+    documents = get_pdf_text(uploaded_file)
+
+    if documents:st.text_area("PDF text preview", documents[0], height=400)
 
 
 def load_streamlit_page():
